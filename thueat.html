@@ -12,11 +12,17 @@
             align-items: center;
             justify-content: center;
             height: 100vh;
-            background-color: #f0f0f0;
             margin: 0;
+            position: relative;
+            overflow: hidden; /* 確保不會顯示出背景圖片之外的部分 */
+            background: linear-gradient(rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0.5)), url('1.png'); /* 替換為你的背景圖片路徑 */
+            background-size: cover;
+            background-position: center;
         }
         h1 {
             color: #333;
+            text-align: center;
+            margin-bottom: 20px;
         }
         #lotteryResult {
             margin-top: 20px;
@@ -26,6 +32,10 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            background-color: rgba(255, 255, 255, 0.8); /* 白色半透明背景 */
+            padding: 10px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* 陰影效果 */
         }
         button {
             padding: 10px 20px;
@@ -35,6 +45,7 @@
             color: white;
             border: none;
             border-radius: 5px;
+            margin-bottom: 20px;
         }
         button:hover {
             background-color: #45a049;
@@ -46,12 +57,23 @@
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
+        
+        .powered-by {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            font-size: 0.8em;
+            color: #666;
+        }
     </style>
 </head>
 <body>
     <h1>吃什麼？(≖‿ゝ≖)✧</h1>
     <button onclick="drawLottery()">抽籤</button>
     <div id="lotteryResult"></div>
+    
+    <!-- 新增的 powered by hfsckrwac -->
+    <div class="powered-by">powered by hfsckrwac</div>
 
     <script>
         function drawLottery() {
