@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>東海吃什麼？ (⑉･̆⌓･̆⑉)</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background-color: #f0f0f0;
+            margin: 0;
+        }
+        h1 {
+            color: #333;
+        }
+        #lotteryResult {
+            margin-top: 20px;
+            font-size: 1.5em;
+            color: #ff6347;
+            height: 2em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 1em;
+            cursor: pointer;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .animate {
+            animation: spin 2s ease-in-out;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <h1>吃什麼？(≖‿ゝ≖)✧</h1>
+    <button onclick="drawLottery()">抽籤</button>
+    <div id="lotteryResult"></div>
+
+    <script>
+        function drawLottery() {
+            const participants = ["張家飯館", "開品快餐", "立揚快餐", "周師傅", "向宏魯肉飯",
+				  "六扇門", "八方雲集", "三媽臭臭鍋", "聞香牛肉麵", "豚將",
+				  "鴨香意麵", "7-11", "全家", "福州包", "麥當勞",
+				  "四海遊龍", "炸雞大獅", "青青", "家樂福", "全聯",
+			   	  "♥探索新知♥", "泡麵", "漢堡王", "摩斯漢堡", "零五"];
+				  
+            const lotteryResult = document.getElementById('lotteryResult');
+            
+            // Reset the animation
+            lotteryResult.classList.remove('animate');
+            void lotteryResult.offsetWidth; // trigger reflow
+            lotteryResult.classList.add('animate');
+
+            // Clear the previous result
+            lotteryResult.innerText = '吃什麼好呢呢...';
+
+            // Simulate the delay of animation
+            setTimeout(() => {
+                const randomIndex = Math.floor(Math.random() * participants.length);
+                const winner = participants[randomIndex];
+                lotteryResult.innerText = `吃吃吃~~~：${winner}`;
+            }, 2000); // match the duration of the animation
+        }
+    </script>
+</body>
+</html>
