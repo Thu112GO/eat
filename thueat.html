@@ -425,7 +425,23 @@
     });
 
     renderTasks();
+
+    // 新增：點擊各象限標題也能輸入任務
+    document.querySelectorAll(".quadrant h3").forEach((titleEl) => {
+      titleEl.style.cursor = "pointer"; // 滑鼠提示
+      titleEl.addEventListener("click", () => {
+        const quadrantId = titleEl.parentElement.id;
+        const text = prompt("請輸入新任務：");
+        if (text && text.trim() !== "") {
+          let tasks = getTasksFromStorage();
+          tasks[quadrantId].push({ text: text.trim(), completed: false });
+          saveTasksToStorage(tasks);
+          renderTasks();
+        }
+      });
+    });
   </script>
 </body>
 </html>
+
 
