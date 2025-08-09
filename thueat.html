@@ -1,164 +1,430 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>科學四象限待辦事項</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 20px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            flex-direction: column;
-            height: 100vh;
-            background-color: #f0f0f0;
-        }
-        h1 {
-            text-align: center;
-            margin: 0;  /* 去除標題與頁面上方的空白 */
-            padding-bottom: 10px; /* 添加少量底部空間 */
-            font-size: 24px; /* 設定標題大小 */
-        }
-        .container {
-            display: grid;
-            grid-template-columns: 1fr 1fr; /* 兩列的設置 */
-            grid-template-rows: 1fr 1fr; /* 兩行的設置 */
-            gap: 20px; /* 增加格子間距 */
-            width: 850px; /* 調整容器寬度 */
-            height: 600px; /* 調整容器高度 */
-        }
-        .quadrant {
-            display: flex;
-            flex-direction: column;
-            justify-content: flex-start;
-            border: 2px solid #333;
-            padding: 15px;
-            background-color: #f4f4f4;
-            border-radius: 8px;
-            overflow-y: auto;
-            height: 270px; /* 每個格子的高度稍微放大 */
-        }
-        .quadrant h2 {
-            text-align: center;
-            margin-bottom: 10px;
-            font-size: 16px; /* 調小標題字體 */
-        }
-        .todo-item {
-            display: flex;
-            align-items: center;
-        }
-        .todo-item input {
-            margin-right: 10px;
-        }
-        button {
-            padding: 6px; /* 按鈕變小 */
-            margin-top: 10px;
-            width: 100%;
-            cursor: pointer;
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            border-radius: 5px;
-        }
-        button:hover {
-            background-color: #45a049;
-        }
-        input[type="text"] {
-            width: 90%; /* 調整輸入框寬度為 90% */
-            padding: 8px;
-            margin-bottom: 10px;
-            border-radius: 5px;
-            border: 1px solid #ddd;
-            margin-left: auto;
-            margin-right: auto;
-        }
-        ul {
-            list-style-type: none;
-            padding: 0;
-            margin-top: 10px;
-            overflow-y: auto;
-            max-height: 130px; /* 限制列表的最大高度 */
-        }
-    </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>時間管理儀表板</title>
+<link
+  rel="stylesheet"
+  href="https://cdnjs.cloudflare.com/ajax/libs/flipclock/0.7.8/flipclock.min.css"
+/>
+<style>
+  /* 全域樣式 */
+  body {
+    background: #222;
+    color: white;
+    font-family: Arial, sans-serif, sans-serif;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+  }
+
+  /* 翻頁時鐘 */
+  .flip-clock-wrapper {
+    width: auto;
+    height: auto;
+    overflow: visible;
+    transform-origin: top center;
+    margin: 20px auto;
+  }
+
+  /* 下半部分 */
+  .bottom-section {
+    display: flex;
+    flex: 1;
+    padding: 20px;
+    gap: 20px;
+  }
+
+  /* 番茄鐘 */
+  .pomodoro {
+    flex: 1;
+    background: #333;
+    border-radius: 10px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .pomodoro h2 {
+    margin-bottom: 20px;
+  }
+
+  .pomodoro-timer {
+    font-size: 48px;
+    margin: 20px 0;
+  }
+
+  .pomodoro button {
+    padding: 10px 20px;
+    font-size: 16px;
+    margin: 5px;
+    cursor: pointer;
+    border: none;
+    border-radius: 5px;
+  }
+
+  .start {
+    background: #4caf50;
+    color: white;
+  }
+
+  .reset {
+    background: #f44336;
+    color: white;
+  }
+
+  /* 進度條容器 */
+  .pomodoro-progress {
+    width: 100%;
+    height: 15px;
+    background: #555;
+    border-radius: 7px;
+    overflow: hidden;
+    margin-top: 15px;
+  }
+
+  /* 進度條 */
+  .progress-bar {
+    height: 100%;
+    width: 100%;
+    background: linear-gradient(90deg, #4caf50, #8bc34a);
+    transition: width 1s linear;
+  }
+
+  /* 完成時動畫閃爍 */
+  .progress-complete {
+    animation: completeFlash 1s ease-in-out 3;
+    background: linear-gradient(90deg, #ff9800, #f44336) !important;
+  }
+
+  @keyframes completeFlash {
+    0%,
+    100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.5;
+    }
+  }
+
+  /* 科學四象限 */
+  .quadrants {
+    flex: 2;
+    background: #333;
+    border-radius: 10px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    gap: 5px;
+    padding: 5px;
+  }
+
+  .quadrant {
+    background: #444;
+    border: 1px solid #555;
+    padding: 10px;
+    overflow-y: auto;
+  }
+
+  .quadrant h3 {
+    font-size: 16px;
+    margin-bottom: 5px;
+  }
+
+  .task {
+    background: #666;
+    padding: 5px;
+    margin: 3px 0;
+    border-radius: 3px;
+    cursor: grab;
+    user-select: none;
+  }
+
+  /* 劃掉狀態樣式 */
+  .task.completed {
+    text-decoration: line-through;
+    opacity: 0.6;
+  }
+
+  .add-task {
+    width: 100%;
+    padding: 5px;
+    margin-top: 5px;
+  }
+</style>
 </head>
 <body>
+  <!-- 翻頁時鐘 -->
+  <div class="clock"></div>
 
-    <h1>待辦事項</h1>
-    
-    <div class="container">
-        <!-- 左上：重要不緊急 -->
-        <div class="quadrant" id="q1">
-            <h2>重要不緊急</h2>
-            <input type="text" id="q1-input" placeholder="添加待辦事項..." onkeydown="checkEnter(event, 'q1')">
-            <ul id="q1-list"></ul>
-            <button onclick="addTodo('q1')">添加任務</button>
-        </div>
+  <!-- 番茄鐘提醒音 -->
+  <audio id="beep-sound" src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg" preload="auto"></audio>
 
-        <!-- 右上：重要且緊急 -->
-        <div class="quadrant" id="q2">
-            <h2>重要且緊急</h2>
-            <input type="text" id="q2-input" placeholder="添加待辦事項..." onkeydown="checkEnter(event, 'q2')">
-            <ul id="q2-list"></ul>
-            <button onclick="addTodo('q2')">添加任務</button>
-        </div>
-
-        <!-- 左下：不重要也不緊急 -->
-        <div class="quadrant" id="q3">
-            <h2>不重要也不緊急</h2>
-            <input type="text" id="q3-input" placeholder="添加待辦事項..." onkeydown="checkEnter(event, 'q3')">
-            <ul id="q3-list"></ul>
-            <button onclick="addTodo('q3')">添加任務</button>
-        </div>
-
-        <!-- 右下：不重要但緊急 -->
-        <div class="quadrant" id="q4">
-            <h2>不重要但緊急</h2>
-            <input type="text" id="q4-input" placeholder="添加待辦事項..." onkeydown="checkEnter(event, 'q4')">
-            <ul id="q4-list"></ul>
-            <button onclick="addTodo('q4')">添加任務</button>
-        </div>
+  <!-- 下半部分 -->
+  <div class="bottom-section">
+    <!-- 番茄鐘 -->
+    <div class="pomodoro">
+      <h2>番茄鐘</h2>
+      <div class="pomodoro-timer" id="pomodoro-timer">25:00</div>
+      <div>
+        <button class="start" onclick="startPomodoro()">開始</button>
+        <button class="reset" onclick="resetPomodoro()">重置</button>
+      </div>
+      <div class="pomodoro-progress">
+        <div class="progress-bar" id="progress-bar"></div>
+      </div>
     </div>
 
-    <script>
-        // 按下 Enter 鍵時新增待辦事項
-        function checkEnter(event, quad) {
-            if (event.key === 'Enter') {
-                addTodo(quad);
-            }
-        }
+    <!-- 科學四象限 -->
+    <div class="quadrants">
+      <div class="quadrant" id="q1">
+        <h3>重要 & 不緊急</h3>
+        <input
+          class="add-task"
+          placeholder="新增任務"
+          onkeypress="addTask(event, 'q1')"
+        />
+      </div>
+      <div class="quadrant" id="q2">
+        <h3>重要 & 緊急</h3>
+        <input
+          class="add-task"
+          placeholder="新增任務"
+          onkeypress="addTask(event, 'q2')"
+        />
+      </div>
+      <div class="quadrant" id="q3">
+        <h3>不重要 & 不緊急</h3>
+        <input
+          class="add-task"
+          placeholder="新增任務"
+          onkeypress="addTask(event, 'q3')"
+        />
+      </div>
+      <div class="quadrant" id="q4">
+        <h3>不重要 & 緊急</h3>
+        <input
+          class="add-task"
+          placeholder="新增任務"
+          onkeypress="addTask(event, 'q4')"
+        />
+      </div>
+    </div>
+  </div>
 
-        // 添加待辦事項的函數
-        function addTodo(quad) {
-            const input = document.getElementById(quad + '-input');
-            const inputValue = input.value.trim();
-            if (inputValue) {
-                const list = document.getElementById(quad + '-list');
-                const newItem = document.createElement('li');
-                newItem.classList.add('todo-item');
-                newItem.innerHTML = `
-                    <input type="checkbox" onchange="toggleTodo(this)">
-                    <span>${inputValue}</span>
-                `;
-                list.appendChild(newItem);
-                input.value = ''; // 清空輸入框
-            } else {
-                alert('請先輸入待辦事項！');
-            }
-        }
+  <!-- JS -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/flipclock/0.7.8/flipclock.min.js"></script>
+  <script>
+    // 翻頁時鐘初始化
+    $(function () {
+      $(".clock").FlipClock({
+        clockFace: "TwentyFourHourClock",
+        showSeconds: true,
+      });
+    });
 
-        // 切換待辦事項的完成狀態
-        function toggleTodo(checkbox) {
-            const span = checkbox.nextElementSibling;
-            if (checkbox.checked) {
-                span.style.textDecoration = 'line-through';
-            } else {
-                span.style.textDecoration = 'none';
-            }
-        }
-    </script>
+    /* 番茄鐘 */
+    const workDuration = 0.2 * 60; // 工作 25 分鐘（秒）
+    const breakDuration = 0.1 * 60; // 休息 5 分鐘（秒）
 
+    let pomodoroTime = workDuration;
+    let isBreak = false;
+    let pomodoroInterval = null;
+    let beepInterval = null; // 控制 beep 循環
+
+    const timerEl = document.getElementById("pomodoro-timer");
+    const progressBar = document.getElementById("progress-bar");
+    const beepSound = document.getElementById("beep-sound");
+
+    function updatePomodoroDisplay() {
+      const minutes = Math.floor(pomodoroTime / 60);
+      const seconds = pomodoroTime % 60;
+      timerEl.textContent =
+        minutes.toString().padStart(2, "0") +
+        ":" +
+        seconds.toString().padStart(2, "0");
+
+      // 更新進度條
+      const total = isBreak ? breakDuration : workDuration;
+      const progress = (pomodoroTime / total) * 100;
+      progressBar.style.width = progress + "%";
+    }
+
+    function animateCompletion() {
+      progressBar.classList.add("progress-complete");
+      setTimeout(() => {
+        progressBar.classList.remove("progress-complete");
+      }, 3000);
+    }
+
+    function playBeepFor5Seconds(callback) {
+      let elapsed = 0;
+      beepInterval = setInterval(() => {
+        beepSound.currentTime = 0;
+        beepSound.play();
+        elapsed += 1000;
+        if (elapsed >= 5000) { // 5秒後停止
+          clearInterval(beepInterval);
+          beepInterval = null;
+          if (callback) callback();
+        }
+      }, 1000);
+    }
+
+    function startPomodoro() {
+      if (pomodoroInterval) return; // 防止重複點擊
+
+      pomodoroInterval = setInterval(() => {
+        pomodoroTime--;
+        if (pomodoroTime < 0) pomodoroTime = 0; // 保護
+
+        updatePomodoroDisplay();
+
+        if (pomodoroTime <= 0) {
+          clearInterval(pomodoroInterval);
+          pomodoroInterval = null;
+
+          animateCompletion();
+
+          // 播放 beep 5 秒，結束後才彈窗
+          playBeepFor5Seconds(() => {
+            alert(isBreak ? "休息結束！回到工作！" : "工作時間到！休息一下吧！");
+            
+            // 切換階段
+            isBreak = !isBreak;
+            pomodoroTime = isBreak ? breakDuration : workDuration;
+            updatePomodoroDisplay();
+            //startPomodoro(); // 等你按確定後再開始下一輪
+          });
+        }
+      }, 1000);
+    }
+
+    function resetPomodoro() {
+      clearInterval(pomodoroInterval);
+      clearInterval(beepInterval);
+      pomodoroInterval = null;
+      beepInterval = null;
+      isBreak = false;
+      pomodoroTime = workDuration;
+      updatePomodoroDisplay();
+      progressBar.style.width = "100%";
+      progressBar.classList.remove("progress-complete");
+    }
+
+    updatePomodoroDisplay();
+
+    /* 科學四象限 with LocalStorage + 劃掉狀態儲存 */
+     function getTasksFromStorage() {
+      return (
+        JSON.parse(localStorage.getItem("tasks")) || {
+          q1: [],
+          q2: [],
+          q3: [],
+          q4: [],
+        }
+      );
+    }
+
+    function saveTasksToStorage(tasks) {
+      localStorage.setItem("tasks", JSON.stringify(tasks));
+    }
+
+    function renderTasks() {
+      const tasks = getTasksFromStorage();
+      ["q1", "q2", "q3", "q4"].forEach((id) => {
+        const quadrant = document.getElementById(id);
+        Array.from(quadrant.querySelectorAll(".task")).forEach((t) => t.remove());
+        tasks[id].forEach((taskObj) => {
+          const task = createTaskElement(taskObj.text, taskObj.completed);
+          quadrant.appendChild(task);
+        });
+      });
+    }
+
+    function createTaskElement(text, completed = false) {
+      const task = document.createElement("div");
+      task.className = "task";
+      task.textContent = text;
+      if (completed) task.classList.add("completed");
+      task.draggable = true;
+      task.addEventListener("dragstart", dragStart);
+
+      let clickTimer = null;
+
+      // 單擊 → 切換完成狀態
+      task.addEventListener("click", () => {
+        if (clickTimer) clearTimeout(clickTimer);
+        clickTimer = setTimeout(() => {
+          task.classList.toggle("completed");
+          const quadrantId = task.parentElement.id;
+          let tasks = getTasksFromStorage();
+          const index = tasks[quadrantId].findIndex((t) => t.text === text);
+          if (index !== -1) {
+            tasks[quadrantId][index].completed = task.classList.contains("completed");
+            saveTasksToStorage(tasks);
+          }
+        }, 200);
+      });
+
+      // 雙擊 → 刪除
+      task.addEventListener("dblclick", () => {
+        if (clickTimer) clearTimeout(clickTimer);
+        if (confirm(`確定要刪除任務「${text}」嗎？`)) {
+          const quadrantId = task.parentElement.id;
+          let tasks = getTasksFromStorage();
+          tasks[quadrantId] = tasks[quadrantId].filter((t) => t.text !== text);
+          saveTasksToStorage(tasks);
+          renderTasks();
+        }
+      });
+      return task;
+    }
+
+    function addTask(event, quadrantId) {
+      if (event.key === "Enter" && event.target.value.trim() !== "") {
+        let tasks = getTasksFromStorage();
+        tasks[quadrantId].push({ text: event.target.value.trim(), completed: false });
+        saveTasksToStorage(tasks);
+        renderTasks();
+        event.target.value = "";
+      }
+    }
+
+    function dragStart(e) {
+      e.dataTransfer.setData("text/plain", e.target.textContent);
+      e.dataTransfer.setData("fromQuadrant", e.target.parentElement.id);
+      e.dataTransfer.setData("completed", e.target.classList.contains("completed"));
+      e.dataTransfer.effectAllowed = "move";
+      setTimeout(() => {
+        e.target.remove();
+      }, 0);
+    }
+
+    document.querySelectorAll(".quadrant").forEach((q) => {
+      q.addEventListener("dragover", (e) => e.preventDefault());
+      q.addEventListener("drop", (e) => {
+        const text = e.dataTransfer.getData("text/plain");
+        const fromQuadrant = e.dataTransfer.getData("fromQuadrant");
+        const completed = e.dataTransfer.getData("completed") === "true";
+        const toQuadrant = e.currentTarget.id;
+
+        let tasks = getTasksFromStorage();
+        tasks[fromQuadrant] = tasks[fromQuadrant].filter((t) => t.text !== text);
+        tasks[toQuadrant].push({ text, completed });
+
+        saveTasksToStorage(tasks);
+        renderTasks();
+      });
+    });
+
+    renderTasks();
+  </script>
 </body>
 </html>
