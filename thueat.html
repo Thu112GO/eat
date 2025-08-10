@@ -13,7 +13,7 @@
   body {
     background: #222;
     color: white;
-    font-family: Arial, sans-serif, sans-serif;
+    font-family: Arial, sans-serif;
     margin: 0;
     padding: 0;
     display: flex;
@@ -68,15 +68,9 @@
     border-radius: 5px;
   }
 
-  .start {
-    background: #4caf50;
-    color: white;
-  }
+  .start { background: #4caf50; color: white; }
+  .reset { background: #f44336; color: white; }
 
-  .reset {
-    background: #f44336;
-    color: white;
-  }
 
   /* 進度條容器 */
   .pomodoro-progress {
@@ -103,15 +97,29 @@
   }
 
   @keyframes completeFlash {
-    0%,
-    100% {
-      opacity: 1;
-    }
-    50% {
-      opacity: 0.5;
-    }
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
   }
 
+  /* 四象限標題列 */
+  .quadrant-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 5px;
+    padding: 0 5px;
+  }
+
+  .reset-tasks {
+    background: #e53935;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+  }
+  .reset-tasks:hover { background: #c62828; }
   /* 科學四象限 */
   .quadrants {
     flex: 2;
@@ -173,47 +181,43 @@
       <div class="pomodoro-timer" id="pomodoro-timer">25:00</div>
       <div>
         <button class="start" onclick="startPomodoro()">開始</button>
-        <button class="reset" onclick="resetPomodoro()">重置</button>
+        <button class="reset" onclick="resetPomodoro()">取消</button>
       </div>
       <div class="pomodoro-progress">
         <div class="progress-bar" id="progress-bar"></div>
       </div>
+      <!-- 新增統計顯示 -->
+      <div id="pomodoro-stats" style="margin-top:15px; font-size:16px;">
+        工作次數：<span id="work-count">0</span>　
+        休息次數：<span id="break-count">0</span>
+      </div>
     </div>
 
-    <!-- 科學四象限 -->
-    <div class="quadrants">
-      <div class="quadrant" id="q1">
-        <h3>重要 & 不緊急</h3>
-        <input
-          class="add-task"
-          placeholder="新增任務"
-          onkeypress="addTask(event, 'q1')"
-        />
-      </div>
-      <div class="quadrant" id="q2">
-        <h3>重要 & 緊急</h3>
-        <input
-          class="add-task"
-          placeholder="新增任務"
-          onkeypress="addTask(event, 'q2')"
-        />
-      </div>
-      <div class="quadrant" id="q3">
-        <h3>不重要 & 不緊急</h3>
-        <input
-          class="add-task"
-          placeholder="新增任務"
-          onkeypress="addTask(event, 'q3')"
-        />
-      </div>
-      <div class="quadrant" id="q4">
-        <h3>不重要 & 緊急</h3>
-        <input
-          class="add-task"
-          placeholder="新增任務"
-          onkeypress="addTask(event, 'q4')"
-        />
-      </div>
+    <!-- 科學四象限區 -->
+    <div style="flex: 2; display: flex; flex-direction: column; background: #333; border-radius: 10px; padding: 5px;">
+      <div class="quadrant-header">
+        <h2>科學四象限</h2>
+        <!-- 這裡改成 id，方便 JS 綁事件 -->
+        <button id="reset-storage-btn" class="reset-tasks">重置任務</button>
+     </div>
+      <div class="quadrants">
+        <div class="quadrant" id="q1">
+          <h3>重要 & 不緊急</h3>
+          <input class="add-task" placeholder="新增任務" onkeypress="addTask(event, 'q1')" />
+        </div>
+        <div class="quadrant" id="q2">
+          <h3>重要 & 緊急</h3>
+          <input class="add-task" placeholder="新增任務" onkeypress="addTask(event, 'q2')" />
+        </div>
+        <div class="quadrant" id="q3">
+          <h3>不重要 & 不緊急</h3>
+          <input class="add-task" placeholder="新增任務" onkeypress="addTask(event, 'q3')" />
+        </div>
+        <div class="quadrant" id="q4">
+          <h3>不重要 & 緊急</h3>
+          <input class="add-task" placeholder="新增任務" onkeypress="addTask(event, 'q4')" />
+        </div>
+     </div>
     </div>
   </div>
 
@@ -242,13 +246,24 @@
     const progressBar = document.getElementById("progress-bar");
     const beepSound = document.getElementById("beep-sound");
 
+    // 統計計數
+    let workCount = parseInt(localStorage.getItem("workCount") || "0");
+    let breakCount = parseInt(localStorage.getItem("breakCount") || "0");
+    const workCountEl = document.getElementById("work-count");
+    const breakCountEl = document.getElementById("break-count");
+
+    function updateStatsDisplay() {
+      workCountEl.textContent = workCount;
+      breakCountEl.textContent = breakCount;
+    }
+    updateStatsDisplay();
+
     function updatePomodoroDisplay() {
       const minutes = Math.floor(pomodoroTime / 60);
       const seconds = pomodoroTime % 60;
       timerEl.textContent =
-        minutes.toString().padStart(2, "0") +
-        ":" +
-        seconds.toString().padStart(2, "0");
+        minutes.toString().padStart(2, "0") + ":" +
+         seconds.toString().padStart(2, "0");
 
       // 更新進度條
       const total = isBreak ? breakDuration : workDuration;
@@ -295,8 +310,18 @@
           // 播放 beep 5 秒，結束後才彈窗
           playBeepFor5Seconds(() => {
             alert(isBreak ? "休息結束！回到工作！" : "工作時間到！休息一下吧！");
-            
-            // 切換階段
+
+            // 更新計數
+            if (isBreak) {
+              breakCount++;
+              localStorage.setItem("breakCount", breakCount);
+            } else {
+              workCount++;
+              localStorage.setItem("workCount", workCount);
+            }
+            updateStatsDisplay();
+
+           // 切換階段
             isBreak = !isBreak;
             pomodoroTime = isBreak ? breakDuration : workDuration;
             updatePomodoroDisplay();
@@ -402,10 +427,8 @@
       e.dataTransfer.setData("fromQuadrant", e.target.parentElement.id);
       e.dataTransfer.setData("completed", e.target.classList.contains("completed"));
       e.dataTransfer.effectAllowed = "move";
-      setTimeout(() => {
-        e.target.remove();
-      }, 0);
-    }
+      setTimeout(() => { e.target.remove(); }, 0);
+     }
 
     document.querySelectorAll(".quadrant").forEach((q) => {
       q.addEventListener("dragover", (e) => e.preventDefault());
@@ -440,8 +463,28 @@
         }
       });
     });
+    renderTasks();
+
+    // 重置 localStorage 按鈕事件
+    document.getElementById("reset-storage-btn").addEventListener("click", () => {
+      if (confirm("確定要重置所有資料嗎？這會清空統計與任務紀錄！")) {
+        localStorage.clear();
+
+        // 重置計數
+        workCount = 0;
+        breakCount = 0;
+        updateStatsDisplay();
+
+        // 重置番茄鐘
+        isBreak = false;
+        pomodoroTime = workDuration;
+        updatePomodoroDisplay();
+
+        renderTasks();
+
+        alert("所有資料已重置！");
+      }
+    });
   </script>
 </body>
 </html>
-
-
